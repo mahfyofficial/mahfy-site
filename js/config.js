@@ -7,8 +7,8 @@ window.MAHFY_CONFIG = {
   tagline: "Kerala spices & coffee, thoughtfully selected.",
   location: "Kerala, India",
   email: "mahfyofficial@gmail.com",
-  whatsapp: "", // digits with country code, e.g. 91XXXXXXXXXX — required so Enquiry opens your chat
-  phone: "",
+  whatsapp: "918304086127", // Enquiry on WhatsApp
+  phone: "919207090583", // tap-to-call
   instagram: "mahfy_official",
   instagramUrl: "https://www.instagram.com/mahfy_official/",
   hours: "Mon–Sat · 9:00–18:00 IST",

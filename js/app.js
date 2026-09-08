@@ -36,13 +36,28 @@
   function digits(s) {
     return String(s || "").replace(/\D/g, "");
   }
+  function inNumber(s) {
+    let n = digits(s);
+    if (n.length === 10) n = "91" + n;
+    return n;
+  }
+  function waNumber() {
+    return inNumber(CFG.whatsapp);
+  }
+  function phoneNumber() {
+    return inNumber(CFG.phone);
+  }
+  function telHref() {
+    const n = phoneNumber();
+    return n ? "tel:+" + n : "";
+  }
   function waBase() {
-    const n = digits(CFG.whatsapp || CFG.phone || "");
+    const n = waNumber();
     return n ? "https://wa.me/" + n : "https://wa.me/";
   }
   function waLink(text) {
     const msg = encodeURIComponent(text || CFG.waMessage || "");
-    const n = digits(CFG.whatsapp || CFG.phone || "");
+    const n = waNumber();
     if (n) return "https://api.whatsapp.com/send?phone=" + n + "&text=" + msg;
     return "https://api.whatsapp.com/send?text=" + msg;
   }
@@ -62,16 +77,28 @@
 
   function setWa() {
     const href = waLink(CFG.waMessage);
-    ["enquiryBtn", "enquiryBtnNav", "floatWa"].forEach((id) => {
+    ["enquiryBtn", "enquiryBtnNav", "enquiryBtnIcon", "floatWa"].forEach((id) => {
       const el = $("#" + id);
       if (el) el.href = href;
     });
+    const call = telHref();
+    ["callBtn", "callBtnNav"].forEach((id) => {
+      const el = $("#" + id);
+      if (el && call) el.href = call;
+    });
     const foot = $("#footerWa");
     if (foot) {
-      const n = CFG.whatsapp || CFG.phone;
+      const n = waNumber();
       foot.innerHTML = n
-        ? `WhatsApp: <a href="${href}" target="_blank" rel="noopener noreferrer">+${digits(n)}</a>`
+        ? `WhatsApp: <a href="${href}" target="_blank" rel="noopener noreferrer">+${n}</a>`
         : `WhatsApp: <a href="${href}" target="_blank" rel="noopener noreferrer">Chat with MAHFY</a>`;
+    }
+    const footPhone = $("#footerPhone");
+    if (footPhone) {
+      const n = phoneNumber();
+      footPhone.innerHTML = n
+        ? `Call: <a href="${call}">+${n}</a>`
+        : "";
     }
   }
 
@@ -83,6 +110,7 @@
       "@type": "Organization",
       name: "MAHFY",
       email: CFG.email,
+      telephone: phoneNumber() ? "+" + phoneNumber() : undefined,
       address: { "@type": "PostalAddress", addressRegion: "Kerala", addressCountry: "IN" },
       sameAs: [CFG.instagramUrl]
     });
@@ -539,6 +567,7 @@
       <p><a href="mailto:${CFG.email}">${CFG.email}</a> · <a href="${CFG.instagramUrl}" target="_blank" rel="noopener noreferrer">@mahfy_official</a></p>
       <p class="hero-cta">
         <a class="btn btn-wa" href="${waLink(CFG.waMessage)}" target="_blank" rel="noopener noreferrer">Enquiry on WhatsApp</a>
+        ${telHref() ? `<a class="btn btn-line" href="${telHref()}">Call ${CFG.phone ? "+" + phoneNumber() : ""}</a>` : ""}
       </p>
       <p class="note">${CFG.shippingNote} Maximum 5 kg per standard order.</p>
     </section>`;
@@ -639,14 +668,32 @@
 
   const menuBtn = $("#menuBtn");
   const nav = $("#nav");
+  const navScrim = $("#navScrim");
   function closeMenu() {
     nav.classList.remove("open");
+    document.body.classList.remove("nav-open");
     menuBtn.setAttribute("aria-expanded", "false");
+    menuBtn.setAttribute("aria-label", "Open menu");
+    if (navScrim) {
+      navScrim.classList.remove("is-open");
+      navScrim.hidden = true;
+    }
+  }
+  function openMenu() {
+    nav.classList.add("open");
+    document.body.classList.add("nav-open");
+    menuBtn.setAttribute("aria-expanded", "true");
+    menuBtn.setAttribute("aria-label", "Close menu");
+    if (navScrim) {
+      navScrim.classList.add("is-open");
+      navScrim.hidden = false;
+    }
   }
   menuBtn.onclick = () => {
-    const open = nav.classList.toggle("open");
-    menuBtn.setAttribute("aria-expanded", String(open));
+    if (nav.classList.contains("open")) closeMenu();
+    else openMenu();
   };
+  if (navScrim) navScrim.onclick = closeMenu;
 
   addEventListener("hashchange", render);
   ticker();
