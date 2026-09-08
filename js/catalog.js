@@ -1,0 +1,238 @@
+/* ============================================================
+   MAHFY — product catalog (central data)
+   Prices in `prices.js` override pricePerKg / availability.
+   Weights are always 100 g–5 kg. Max order: 5 kg.
+   ============================================================ */
+window.MAHFY_CATEGORIES = [
+  { id: "cardamom", label: "Cardamom" },
+  { id: "pepper", label: "Pepper" },
+  { id: "coffee", label: "Coffee" },
+  { id: "other", label: "Other spices" }
+];
+
+window.MAHFY_PRODUCTS = [
+  {
+    id: "card-8mm",
+    name: "Cardamom — 8 mm",
+    category: "cardamom",
+    grade: "8 mm",
+    origin: "Kerala",
+    description: "Extra-bold green cardamom pods, graded at 8 mm. Chosen when you want large, well-filled pods for gifting, display and special cooking.",
+    storage: "Keep whole pods in an airtight container, away from heat, steam and sunlight. Crush just before use.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-8mm.jpg", "assets/spices/cardamom-8mm-b.jpg", "assets/spices/cardamom-8mm-c.jpg"],
+    tags: ["8 mm", "Extra bold"]
+  },
+  {
+    id: "card-7-8mm",
+    name: "Cardamom — 7–8 mm",
+    category: "cardamom",
+    grade: "7–8 mm",
+    origin: "Kerala",
+    description: "Bold green cardamom graded 7–8 mm — a strong everyday premium size for chai, sweets and cooking.",
+    storage: "Keep whole pods airtight, away from heat and light.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-7-8mm.jpg", "assets/spices/cardamom-7-8mm-b.jpg"],
+    tags: ["7–8 mm", "Bold"]
+  },
+  {
+    id: "card-7mm",
+    name: "Cardamom — 7 mm",
+    category: "cardamom",
+    grade: "7 mm",
+    origin: "Kerala",
+    description: "Green cardamom graded at 7 mm. A clear, consistent size for regular kitchen use.",
+    storage: "Store whole, airtight, away from moisture and light.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-7mm.jpg", "assets/spices/cardamom-7mm-b.jpg"],
+    tags: ["7 mm"]
+  },
+  {
+    id: "card-6-7mm",
+    name: "Cardamom — 6–7 mm",
+    category: "cardamom",
+    grade: "6–7 mm",
+    origin: "Kerala",
+    description: "Green cardamom graded 6–7 mm — a practical size for tea and everyday cooking.",
+    storage: "Store whole, airtight, away from moisture and light.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-6-7mm.jpg", "assets/spices/cardamom-6mm.jpg"],
+    tags: ["6–7 mm"]
+  },
+  {
+    id: "card-6mm",
+    name: "Cardamom — 6 mm",
+    category: "cardamom",
+    grade: "6 mm",
+    origin: "Kerala",
+    description: "Green cardamom graded at 6 mm. Useful for home cooking and spice mixes.",
+    storage: "Store airtight, away from steam and sunlight.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-6mm.jpg", "assets/spices/cardamom-6-7mm.jpg"],
+    tags: ["6 mm"]
+  },
+  {
+    id: "card-5mm",
+    name: "Cardamom — 5 mm",
+    category: "cardamom",
+    grade: "5 mm",
+    origin: "Kerala",
+    description: "Smaller green cardamom graded at 5 mm — suited to blending, grinding and everyday cooking.",
+    storage: "Store airtight, away from steam and sunlight.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-5mm.jpg", "assets/spices/cardamom-5mm-b.jpg"],
+    tags: ["5 mm"]
+  },
+  {
+    id: "card-4mm",
+    name: "Cardamom — 4 mm",
+    category: "cardamom",
+    grade: "4 mm",
+    origin: "Kerala",
+    description: "Green cardamom graded at 4 mm. Often chosen for powder, extracts and blends.",
+    storage: "Store airtight, away from moisture and light.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-4mm.jpg", "assets/spices/cardamom-4mm-b.jpg"],
+    tags: ["4 mm"]
+  },
+  {
+    id: "card-3mm",
+    name: "Cardamom — 3 mm",
+    category: "cardamom",
+    grade: "3 mm",
+    origin: "Kerala",
+    description: "The smallest listed grade at 3 mm — typically used where pod size is not the main concern.",
+    storage: "Store airtight, away from moisture and light.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-3mm.jpg", "assets/spices/cardamom-4mm.jpg"],
+    tags: ["3 mm"]
+  },
+  {
+    id: "pepper-malabar",
+    name: "Black Pepper — Malabar",
+    category: "pepper",
+    grade: "Whole",
+    origin: "Kerala",
+    description: "Whole black pepper from Kerala for daily cooking — sharp heat and a clean, familiar pepper aroma.",
+    storage: "Keep whole peppercorns airtight, away from steam. Crack or grind just before use.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/pepper-malabar.jpg?v=2", "assets/spices/pepper-telli.jpg?v=2"],
+    tags: ["Whole", "Everyday"]
+  },
+  {
+    id: "pepper-telli",
+    name: "Black Pepper — Tellicherry",
+    category: "pepper",
+    grade: "Extra bold",
+    origin: "Kerala",
+    description: "Larger black pepper berries with a fuller aroma — suited to finishing and cooking where pepper is meant to be noticed.",
+    storage: "Store whole, airtight, away from heat and moisture.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/pepper-telli.jpg?v=2", "assets/spices/pepper-malabar.jpg?v=2"],
+    tags: ["Extra bold", "Aromatic"]
+  },
+  {
+    id: "pepper-white",
+    name: "White Pepper",
+    category: "pepper",
+    grade: "Whole",
+    origin: "Kerala",
+    description: "Whole white peppercorns with a milder, earthy heat — often used in lighter sauces and pale dishes.",
+    storage: "Store airtight, away from moisture and light.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/pepper-white.jpg?v=2", "assets/spices/pepper-malabar.jpg?v=2"],
+    tags: ["Whole", "Milder heat"]
+  },
+  {
+    id: "pepper-ground",
+    name: "Ground Black Pepper",
+    category: "pepper",
+    grade: "Fine",
+    origin: "Kerala",
+    description: "Ground black pepper for table and kitchen use when you need it ready to cook.",
+    storage: "Keep tightly closed, away from steam. Use while the aroma is still bright.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 6–9 months of packing when stored well.",
+    images: ["assets/spices/pepper-ground.jpg?v=2", "assets/spices/pepper-malabar.jpg?v=2"],
+    tags: ["Ground", "Ready to use"]
+  },
+  {
+    id: "coffee-arabica",
+    name: "Coffee — Arabica",
+    category: "coffee",
+    type: "Whole bean",
+    grade: "Whole bean",
+    origin: "Kerala",
+    description: "Kerala-origin Arabica coffee as whole beans. Roast and grind notes may vary by lot — ask us if you need a specific profile.",
+    storage: "Keep beans airtight, away from heat, moisture and strong odours. Grind just before brewing.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within a few weeks of opening; keep sealed between uses.",
+    images: ["assets/spices/coffee-arabica.jpg?v=2", "assets/spices/coffee-robusta.jpg?v=2"],
+    tags: ["Whole bean"]
+  },
+  {
+    id: "coffee-robusta",
+    name: "Coffee — Robusta",
+    category: "coffee",
+    type: "Whole bean",
+    grade: "Whole bean",
+    origin: "Kerala",
+    description: "Kerala-origin Robusta coffee as whole beans — typically used for a stronger cup and filter-style brews.",
+    storage: "Store airtight, away from light and moisture. Grind just before brewing.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within a few weeks of opening; keep sealed between uses.",
+    images: ["assets/spices/coffee-robusta.jpg?v=2", "assets/spices/coffee-arabica.jpg?v=2"],
+    tags: ["Whole bean", "Strong"]
+  },
+  {
+    id: "coffee-filter",
+    name: "Coffee — Filter Blend",
+    category: "coffee",
+    type: "Ground",
+    grade: "Ground",
+    origin: "Kerala",
+    description: "A roasted-and-ground filter coffee blend for South-Indian filter coffee. Ask us for the current lot details when you order.",
+    storage: "Keep tightly closed, away from steam. Use while the aroma is still lively.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within a few weeks of opening.",
+    images: ["assets/spices/coffee-filter.jpg?v=2", "assets/spices/coffee-arabica.jpg?v=2"],
+    tags: ["Ground", "Filter"]
+  },
+  {
+    id: "nutmeg-whole",
+    name: "Nutmeg — Whole",
+    category: "other",
+    grade: "Whole seed",
+    origin: "Kerala",
+    description: "Whole nutmeg for grating fresh into cooking, baking and spice mixes.",
+    storage: "Keep whole seeds airtight. Grate as needed.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/nutmeg-whole.jpg", "assets/spices/nutmeg-mace.jpg"],
+    tags: ["Whole"]
+  },
+  {
+    id: "nutmeg-mace",
+    name: "Mace (Javitri)",
+    category: "other",
+    grade: "Blades",
+    origin: "Kerala",
+    description: "Mace blades — the outer aril of nutmeg — used in biryani and spice blends.",
+    storage: "Store airtight, away from light and moisture.",
+    packaging: "Packed to order in food-safe bags.",
+    bestBefore: "Best enjoyed within 12 months of packing when stored well.",
+    images: ["assets/spices/nutmeg-mace.jpg", "assets/spices/nutmeg-whole.jpg"],
+    tags: ["Blades"]
+  }
+];
