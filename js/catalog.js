@@ -12,6 +12,19 @@ window.MAHFY_CATEGORIES = [
 
 window.MAHFY_PRODUCTS = [
   {
+    id: "card-seeds",
+    name: "Cardamom seed",
+    category: "cardamom",
+    grade: "Seed (decorticated)",
+    origin: "Kerala",
+    description: "Inner cardamom seeds, husked from the green pod. Ready for chai, sweets, grinding and masala — no husk to pick out. Compact and aromatic, so home kitchens and people going abroad for work or study often choose seed over whole pods.",
+    storage: "Keep airtight, away from heat, steam and sunlight. Seeds lose aroma faster than whole pods once opened — close the pack well after each use.",
+    packaging: "Packed to order in food-safe bags, sealed for the kitchen and for travel packing.",
+    bestBefore: "Best enjoyed within 9–12 months of packing when stored well.",
+    images: ["assets/spices/cardamom-seed-kernels.jpg"],
+    tags: ["Seed", "Home kitchen", "Going abroad"]
+  },
+  {
     id: "card-8mm",
     name: "Cardamom — 8 mm",
     category: "cardamom",

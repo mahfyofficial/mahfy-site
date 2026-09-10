@@ -53,6 +53,11 @@ window.MAHFY_PRICES = /* JSON_START */
       "price": 3400,
       "inStock": true
     },
+    "card-seeds": {
+      "name": "Cardamom seed",
+      "price": 5400,
+      "inStock": true
+    },
     "pepper-malabar": {
       "name": "Black Pepper — Malabar",
       "price": 980,

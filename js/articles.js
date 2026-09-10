@@ -3,6 +3,21 @@
    ============================================================ */
 window.MAHFY_ARTICLES = [
   {
+    slug: "spices-for-home-and-abroad",
+    title: "Spices for home — and for packing abroad",
+    date: "2026-09-10",
+    minutes: 4,
+    image: "assets/packaging-care.jpg",
+    excerpt: "MAHFY packs for two kitchens: the one you cook in every day, and the one you set up after you go abroad for work or study.",
+    body: [
+      "Most people who message us are buying for one of two reasons. Either the pack is for the house — chai, rice, a month of cooking — or it is for someone going abroad for a job or studies, packing spices to take with them.",
+      "For home use, start small if you are trying a grade. 100 g or 250 g is enough to taste a cardamom size. 500 g and 1 kg suit a kitchen that cooks Kerala food most weeks. Whole pods keep aroma longer on the shelf; cardamom seed is ready for tea and sweets without husking.",
+      "If you are migrating for work or study, weight and seal matter. Cardamom seed is compact — you carry the kernel, not the husk. Whole pepper and a tight cardamom pack are what many people ask for. Tell us you are flying so we can pack bags that close well in a suitcase.",
+      "We seal and ship in India. Airline security, baggage limits and the rules of the country you enter are yours to check. We do not promise that spices can travel on every route.",
+      "On WhatsApp, write home use or going abroad for work / study, then the products and weights. We will confirm what is in stock and how we will pack it."
+    ]
+  },
+  {
     slug: "understanding-cardamom-grades",
     title: "Understanding cardamom grades",
     date: "2026-08-12",

@@ -70,7 +70,7 @@
     const bits = products
       .filter((p) => p.pricePerKg != null)
       .map((p) => `<span class="tk">${p.name}${p.grade ? " (" + p.grade + ")" : ""} <b>${fmt(p.pricePerKg)}</b>/kg</span>`);
-    const extra = `<span class="tk tk-ship">Shipping charges extra</span>`;
+    const extra = `<span class="tk tk-ship">Shipping charges extra</span><span class="tk">Home kitchen</span><span class="tk">Going abroad</span><span class="tk">Cardamom seed</span>`;
     const html = bits.join("<span class='tk'>·</span>") + extra;
     $("#tickerTrack").innerHTML = html + html;
   }
@@ -123,34 +123,36 @@
   function productCard(p) {
     const start = p.pricePerKg != null ? packPrice(p.pricePerKg, 100) : null;
     const cat = (CATS.find((c) => c.id === p.category) || {}).label || p.category;
-    return `<article class="card card-${p.category}">
+    const seed = p.id === "card-seeds";
+    return `<article class="card card-${p.category}${seed ? " card-featured" : ""}">
       <a href="#/product/${p.id}" data-link>
-        <div class="card-img"><img src="${p.images[0]}" alt="${p.name}" /></div>
+        <div class="card-img"><img src="${p.images[0]}" alt="${p.name}" />${seed ? `<span class="card-badge">Home &amp; abroad</span>` : ""}</div>
         <div class="card-body">
-          <p class="kicker">${cat}</p>
+          <p class="kicker">${cat}${seed ? " · Seed" : ""}</p>
           <h3>${p.name}</h3>
           <p class="meta">${p.grade}${p.type ? " · " + p.type : ""} · Origin: ${p.origin}</p>
           <p class="price">${start != null ? "From " + fmt(start) + " / 100 g" : "Price on enquiry"}</p>
           <p class="ship-flag">Shipping charges extra</p>
           <p class="meta">Available</p>
           <div class="weights">${WEIGHTS.map((w) => `<span>${w.label}</span>`).join("")}</div>
-          <span class="btn btn-line">View details</span>
+          <span class="btn btn-line">Choose pack</span>
         </div>
       </a>
       <p class="card-wa">
         <a class="btn btn-wa" href="${waLink(
           "Hi MAHFY, I would like to order " + p.name + (p.grade ? " (" + p.grade + ")" : "") + ". Packs from 100 g to 5 kg. Shipping extra."
-        )}" target="_blank" rel="noopener noreferrer">Order on WhatsApp</a>
+        )}" target="_blank" rel="noopener noreferrer">Buy on WhatsApp</a>
       </p>
     </article>`;
   }
 
   function home() {
-    title("Kerala cardamom, pepper & coffee");
+    title("Kerala spices for home and abroad");
     const featured = products.filter((p) =>
-      ["card-8mm", "card-7-8mm", "pepper-malabar", "coffee-arabica"].includes(p.id)
+      ["card-seeds", "card-8mm", "pepper-malabar", "coffee-arabica"].includes(p.id)
     );
     const ig = [
+      "assets/spices/cardamom-seed-kernels.jpg",
       "assets/spices/cardamom-8mm.jpg",
       "assets/kerala-plantation.jpg",
       "assets/spices/pepper-malabar.jpg?v=2",
@@ -158,68 +160,94 @@
       "assets/packaging-care.jpg",
       "assets/spices/cardamom-7-8mm.jpg",
       "assets/spices/cardamom-6-7mm.jpg",
-      "assets/spices/cardamom-7mm.jpg",
       "assets/spices/cardamom-benefits.jpg"
     ];
     return `<section class="wrap hero">
       <div class="hero-copy">
-        <p class="kicker">Kerala origin</p>
-        <h1>Kerala's finest cardamom, pepper &amp; coffee.</h1>
-        <p class="sub">Carefully graded. Thoughtfully packed. Straight from Kerala.</p>
-        <p>Discover carefully selected Kerala cardamom, black pepper and coffee, available in multiple grades and convenient quantities from 100 g to 5 kg.</p>
+        <p class="kicker">In stock · Packed to order</p>
+        <h1>Smell it. Cook it. Take it with you.</h1>
+        <p class="sub">Kerala cardamom seed, pepper and coffee — packs from 100 g, ready for the kitchen or a suitcase.</p>
+        <p>This is a shop, not a brochure. Pick a grade, tap WhatsApp, we pack. Home cooks and people going abroad for work or study order the same way.</p>
         <p class="ship-callout">${CFG.shippingNote}</p>
         <div class="hero-cta">
-          <a class="btn btn-dark" href="#/shop" data-link>Shop Now</a>
-          <a class="btn btn-wa" href="${waLink(CFG.waMessage)}" target="_blank" rel="noopener noreferrer">Enquiry on WhatsApp</a>
+          <a class="btn btn-dark" href="#/product/card-seeds" data-link>Buy cardamom seed</a>
+          <a class="btn btn-wa" href="${waLink(CFG.waMessage)}" target="_blank" rel="noopener noreferrer">Order on WhatsApp</a>
+          <a class="btn btn-line" href="#/shop" data-link>See all spices</a>
         </div>
         <div class="trust">
-          <span class="pill">Kerala Origin</span>
-          <span class="pill">Multiple Grades</span>
+          <span class="pill">Cardamom seed in stock</span>
           <span class="pill">100 g – 5 kg</span>
+          <span class="pill">Home kitchen</span>
+          <span class="pill">Going abroad</span>
           <span class="pill pill-ship">Shipping extra</span>
-          <span class="pill">Carefully Packed</span>
         </div>
-        <p class="note">Prices updated: ${dateLabel}. ${CFG.priceNote} ${CFG.shippingNote}</p>
+        <p class="note">Prices updated: ${dateLabel}. ${CFG.priceNote}</p>
       </div>
       <div class="hero-visual">
-        <img class="hero-main" src="assets/kerala-plantation.jpg" alt="Kerala hill country" />
+        <img class="hero-main" src="assets/spices/cardamom-seed-kernels.jpg" alt="Kerala cardamom seed" />
         <div class="hero-stack">
-          <img src="assets/spices/cardamom-8mm.jpg" alt="Cardamom 8 mm" />
+          <img src="assets/spices/cardamom-8mm.jpg" alt="Cardamom pods" />
           <img src="assets/spices/pepper-malabar.jpg?v=2" alt="Black pepper" />
           <img src="assets/spices/coffee-arabica.jpg?v=2" alt="Coffee beans" />
         </div>
       </div>
     </section>
-    <section class="wrap section">
+    <section class="wrap section shop-first">
       <div class="center">
-        <p class="kicker">Catalogue</p>
-        <h2>Shop by spice</h2>
-        <p class="lead">Each lot shows its grade and pack prices. We sell from 100 g up to 5 kg per order.</p>
+        <p class="kicker">Buy now</p>
+        <h2>Start with a pack.</h2>
+        <p class="lead">Cardamom seed is the compact kernel — chai, masala, and lighter to carry abroad. Prices from 100 g.</p>
       </div>
       <div class="grid-4" style="margin-top:2rem">${featured.map(productCard).join("")}</div>
-      <p class="center" style="margin-top:1.5rem"><a class="btn btn-dark" href="#/shop" data-link>View all products</a></p>
+      <p class="center" style="margin-top:1.5rem"><a class="btn btn-dark" href="#/shop" data-link>Shop the full cupboard</a></p>
+    </section>
+    <section class="wrap section">
+      <div class="center">
+        <p class="kicker">Who we pack for</p>
+        <h2>Two kitchens. One order.</h2>
+        <p class="lead">Tell us on WhatsApp whether the pack is for the house, or you are going abroad for work or study.</p>
+      </div>
+      <div class="audience">
+        <article>
+          <p class="kicker">Home use</p>
+          <h3>For the Kerala kitchen at home</h3>
+          <p class="muted">Smaller packs for chai, rice and weekly cooking. Choose a cardamom grade by pod size, or cardamom seed if you want the kernel ready for tea and sweets. Pepper and coffee in quantities you will actually finish.</p>
+          <p style="margin-top:1rem"><a class="btn btn-line" href="#/shop" data-link>Shop home packs</a></p>
+        </article>
+        <article>
+          <p class="kicker">Going abroad</p>
+          <h3>For work or study overseas</h3>
+          <p class="muted">Sealed packs for people migrating for a job or a course — Gulf, Europe, the UK, the US and elsewhere. Cardamom seed is compact — more flavour for the weight in a suitcase. We pack clean and tight; you check airline and destination rules before you fly.</p>
+          <p style="margin-top:1rem"><a class="btn btn-wa" href="${waLink(
+            "Hi MAHFY, I am going abroad for work / study and packing spices to take with me. Please suggest cardamom (pods or seed), pepper and pack sizes."
+          )}" target="_blank" rel="noopener noreferrer">Pack for going abroad</a></p>
+        </article>
+      </div>
     </section>
     <section class="wrap section split">
       <div>
-        <p class="kicker">Cardamom</p>
-        <h2>Graded by millimetre. Named as you see it.</h2>
-        <p class="muted">Each cardamom listing uses the pod size in the name — 8 mm, 7–8 mm, 7 mm, 6–7 mm, 6 mm, 5 mm, 4 mm and 3 mm — with photographs of that grade.</p>
-        <p class="ship-callout">Shipping charges extra</p>
-        <p style="margin-top:1rem"><a class="btn btn-line" href="#/shop/cardamom" data-link>Shop cardamom grades</a></p>
+        <p class="kicker">Cardamom seed</p>
+        <h2>The kernel. No husk. Ready for chai.</h2>
+        <p class="muted">This is the inner seed, husked from green cardamom. Use it in tea, sweets and masala. People going abroad often choose seed because it travels lighter than a bag of pods. Whole pods are still listed by millimetre if you want the look of the pod.</p>
+        <p class="ship-callout">From packs of 100 g · Shipping extra</p>
+        <p class="hero-cta" style="margin-top:1.1rem">
+          <a class="btn btn-dark" href="#/product/card-seeds" data-link>Buy cardamom seed</a>
+          <a class="btn btn-line" href="#/shop/cardamom" data-link>See all cardamom</a>
+        </p>
       </div>
-      <img class="benefits-img" src="assets/spices/cardamom-benefits.jpg" alt="Cardamom — traditional uses people often associate with the spice" />
+      <img class="benefits-img" src="assets/spices/cardamom-seed-kernels.jpg" alt="Kerala cardamom seed kernels" />
     </section>
     <section class="dark-band why">
       <div class="wrap">
         <div class="center">
           <p class="kicker">Why MAHFY?</p>
-          <h2>Clear grades. Practical packs.</h2>
+          <h2>Home cook. Going abroad. Honest grades.</h2>
         </div>
         <div class="grid-4" style="margin-top:2rem">
-          <article class="card"><div class="card-body"><h3>Kerala origin</h3><p>Products sourced from Kerala.</p></div></article>
-          <article class="card"><div class="card-body"><h3>Multiple grades</h3><p>Choose according to your requirement and budget.</p></div></article>
-          <article class="card"><div class="card-body"><h3>Small to large packs</h3><p>Convenient quantities from 100 g to 5 kg.</p></div></article>
-          <article class="card"><div class="card-body"><h3>Careful packing</h3><p>Orders prepared and packed with attention.</p></div></article>
+          <article class="card"><div class="card-body"><h3>Home kitchen</h3><p>Packs you will use — 100 g to 5 kg — not wholesale lots.</p></div></article>
+          <article class="card"><div class="card-body"><h3>Going abroad</h3><p>Sealed bags for suitcase packing when you leave for a job or studies. Ask us what travels well.</p></div></article>
+          <article class="card"><div class="card-body"><h3>Clear grades</h3><p>Cardamom by pod size, plus cardamom seed. Choose by need and budget.</p></div></article>
+          <article class="card"><div class="card-body"><h3>Kerala origin</h3><p>Cardamom, pepper and coffee sourced from Kerala.</p></div></article>
         </div>
       </div>
     </section>
@@ -227,8 +255,8 @@
       <div class="split">
         <div>
           <p class="kicker">Packed with care.</p>
-          <h2>Every order is prepared with attention to cleanliness, freshness and secure packaging so your spices and coffee reach you in good condition.</h2>
-          <p class="muted" style="margin-top:1rem">We pack to order in food-safe bags. Shipping is arranged after you place the order. Shipping charges are extra unless a specific offer says otherwise.</p>
+          <h2>Every order is prepared with attention to cleanliness, freshness and a seal that holds — on the shelf at home, and in a bag when you travel.</h2>
+          <p class="muted" style="margin-top:1rem">We pack to order in food-safe bags. Shipping is arranged after you place the order. Shipping charges are extra unless a specific offer says otherwise. If you are flying, tell us on WhatsApp so we can pack tight; airline and customs rules are yours to check.</p>
         </div>
         <img src="assets/packaging-care.jpg" alt="Spices packed in kraft bags" style="border-radius:18px;width:100%;object-fit:cover;aspect-ratio:4/3" />
       </div>
@@ -271,8 +299,8 @@
     const list = products.filter((p) => active === "all" || p.category === active);
     return `<section class="wrap page-head">
       <p class="kicker">Shop</p>
-      <h1>The MAHFY cupboard</h1>
-      <p class="muted">Cardamom, pepper, coffee and selected spices. 100 g to 5 kg. Maximum 5 kg per order.</p>
+      <h1>Take a pack home.</h1>
+      <p class="muted">Cardamom seed, pods by millimetre, pepper, coffee — tap WhatsApp and we pack. 100 g to 5 kg.</p>
       <div class="filters">
         <button class="chip ${active === "all" ? "active" : ""}" data-cat="all">All</button>
         ${CATS.map((c) => `<button class="chip ${active === c.id ? "active" : ""}" data-cat="${c.id}">${c.label}</button>`).join("")}
@@ -315,6 +343,28 @@
         <p class="price" id="pdpPrice">${p.pricePerKg != null ? fmt(packPrice(p.pricePerKg, 100)) : "—"}</p>
         <p class="note" id="pdpUnit">${p.pricePerKg != null ? fmt(p.pricePerKg) + " / kg · MAHFY retail" : ""}</p>
         <p class="ship-callout">Shipping charges extra — not included in this price.</p>
+        <div class="sell-path">
+          <p class="kicker">How to buy</p>
+          <p>This is a catalogue. You choose the product, tell us <strong>home kitchen</strong> or <strong>going abroad for work or study</strong>, then order on WhatsApp. We confirm grade, weight and a seal that fits that use.</p>
+          <div class="audience audience-compact">
+            <article>
+              <p class="kicker">Home use</p>
+              <h3>For the kitchen at home</h3>
+              <p class="muted">${p.id === "card-seeds" ? "Seed is ready for chai, sweets and masala — no husk to pick. Start with 100 g or 250 g if you are trying the lot; 500 g or 1 kg for the regular cupboard." : "Start with 100 g or 250 g to try a grade. 500 g and 1 kg suit weekly Kerala cooking. Whole pods keep aroma on the shelf."}</p>
+              <p style="margin-top:.8rem"><a class="btn btn-line" href="${waLink(
+                "Hi MAHFY, this is for home use. I would like " + p.name + (p.grade ? " (" + p.grade + ")" : "") + ". Please suggest a pack size."
+              )}" target="_blank" rel="noopener noreferrer">WhatsApp — home pack</a></p>
+            </article>
+            <article>
+              <p class="kicker">Going abroad</p>
+              <h3>For work or study overseas</h3>
+              <p class="muted">${p.id === "card-seeds" ? "Seed travels lighter than whole pods — you carry the kernel, not the husk. Ask for a tight, sealed bag. Airline and destination rules are yours to check." : "Ask for a sealed pack to take with you. Cardamom seed is more compact if suitcase weight matters. You check airline and customs rules before you fly."}</p>
+              <p style="margin-top:.8rem"><a class="btn btn-wa" href="${waLink(
+                "Hi MAHFY, I am going abroad for work / study. I would like " + p.name + (p.grade ? " (" + p.grade + ")" : "") + ". Please suggest a sealed pack to take with me."
+              )}" target="_blank" rel="noopener noreferrer">WhatsApp — going abroad</a></p>
+            </article>
+          </div>
+        </div>
         <p class="kicker">Weight</p>
         <div class="weight-pick" id="weightPick">
           ${WEIGHTS.map((w, i) => `<button type="button" data-g="${w.grams}" class="${i === 0 ? "active" : ""}">${w.label}</button>`).join("")}
@@ -327,7 +377,7 @@
         </div>
         <p class="note">Maximum 5 kg per order. Orders are placed on WhatsApp — there is no cart on this site.</p>
         <div class="hero-cta">
-          <a class="btn btn-wa" id="waOrder" target="_blank" rel="noopener noreferrer" href="#">Order on WhatsApp</a>
+          <a class="btn btn-wa" id="waOrder" target="_blank" rel="noopener noreferrer" href="#">Buy this pack on WhatsApp</a>
         </div>
         <dl class="facts">
           <div><dt>Grade</dt><dd>${p.grade}</dd></div>
@@ -382,7 +432,7 @@
       if (p.pricePerKg != null) {
         bits.push("Approx. product total: " + fmt(packPrice(p.pricePerKg, grams) * qty) + " (shipping extra)");
       }
-      bits.push("", "Shipping charges extra. Please confirm availability and shipping.");
+      bits.push("", "Purpose: home use / going abroad for work or study (please confirm).", "Shipping charges extra. Please confirm availability and shipping.");
       return bits.filter(Boolean).join("\n");
     }
     function refresh() {
@@ -402,7 +452,7 @@
       }
       if (waOrder) {
         waOrder.href = waLink(orderText());
-        waOrder.textContent = over ? "Bulk enquiry on WhatsApp" : "Order on WhatsApp";
+        waOrder.textContent = over ? "Bulk enquiry on WhatsApp" : "Buy this pack on WhatsApp";
       }
     }
     $("#weightPick").addEventListener("click", (e) => {
@@ -460,12 +510,24 @@
     return `<section class="wrap page-head">
       <p class="kicker">How to order</p>
       <h1>Order only on WhatsApp.</h1>
-      <p class="muted">This site is a catalogue. There is no cart or checkout. You browse grades and prices, then send your order on WhatsApp.</p>
+      <p class="muted">This site is a catalogue. There is no cart or checkout. Our selling method is simple: you tell us which kitchen the spices are for, we suggest the pack, you confirm on WhatsApp.</p>
       <div class="steps" style="margin-top:2rem">
-        <article class="step"><span class="step-n">01</span><h3>Choose your product</h3><p class="muted">Browse cardamom, pepper, coffee and other spices.</p></article>
-        <article class="step"><span class="step-n">02</span><h3>Note the grade and quantity</h3><p class="muted">Packs from 100 g to 5 kg. Standard orders up to 5 kg.</p></article>
-        <article class="step"><span class="step-n">03</span><h3>Message MAHFY on WhatsApp</h3><p class="muted">Use Enquiry on WhatsApp, the green buttons, or the floating chat. Share product, grade, quantity and your PIN code.</p></article>
-        <article class="step"><span class="step-n">04</span><h3>We confirm, pack and ship</h3><p class="muted">Payment and courier are confirmed with you. Shipping charges extra.</p></article>
+        <article class="step"><span class="step-n">01</span><h3>Say home or going abroad</h3><p class="muted">Home kitchen in India, or packing spices to take with you for a job or studies. That decides pods vs seed, and how tightly we pack.</p></article>
+        <article class="step"><span class="step-n">02</span><h3>Choose product and weight</h3><p class="muted">Cardamom pods, cardamom seed, pepper, coffee. 100 g to 5 kg.</p></article>
+        <article class="step"><span class="step-n">03</span><h3>Message MAHFY on WhatsApp</h3><p class="muted">Share product, grade, quantity, PIN code, and whether you are flying.</p></article>
+        <article class="step"><span class="step-n">04</span><h3>We confirm, pack and ship</h3><p class="muted">We pack in India. Shipping extra. If you carry the pack abroad, airline and customs rules are yours to check.</p></article>
+      </div>
+      <div class="audience" style="margin-top:2.5rem">
+        <article>
+          <p class="kicker">Home use</p>
+          <h3>Everyday packs</h3>
+          <p class="muted">Order what you will cook through. 100 g and 250 g for trying a grade; 500 g and 1 kg for the regular cupboard.</p>
+        </article>
+        <article>
+          <p class="kicker">Going abroad</p>
+          <h3>Packing for work or study overseas</h3>
+          <p class="muted">Ask for a sealed pack to take with you. Cardamom seed and whole pepper travel compactly. We do not advise on airline or customs rules — check those yourself before you fly.</p>
+        </article>
       </div>
       <div class="split" style="margin-top:3rem">
         <div>
@@ -491,6 +553,10 @@
   }
 
   function kitchenArticle(slug) {
+    if (slug === "spices-for-home-and-pravasi") {
+      location.hash = "#/kitchen/spices-for-home-and-abroad";
+      return "";
+    }
     const a = ARTICLES.find((x) => x.slug === slug);
     if (!a) return notFound();
     title(a.title);
@@ -507,8 +573,10 @@
   function faqPage() {
     title("FAQ");
     const items = [
-      ["What products does MAHFY sell?", "Kerala-origin cardamom, black pepper, coffee and selected spices, in listed grades and pack sizes."],
-      ["What cardamom grades are available?", "We list cardamom by pod size: 8 mm, 7–8 mm, 7 mm, 6–7 mm, 6 mm, 5 mm, 4 mm and 3 mm. Check the shop for live availability and prices."],
+      ["What products does MAHFY sell?", "Kerala-origin cardamom (whole pods by millimetre grade, plus cardamom seed), black pepper, coffee and selected spices, in listed pack sizes."],
+      ["What cardamom grades are available?", "Whole pods by size: 8 mm, 7–8 mm, 7 mm, 6–7 mm, 6 mm, 5 mm, 4 mm and 3 mm. We also sell cardamom seed (the inner kernel, husked). Check the shop for live availability and prices."],
+      ["Who is MAHFY for?", "Home kitchens in India, and people going abroad for work or study who want to pack spices to take with them. Tell us which when you message — pack size and product (pods vs seed) often change with that."],
+      ["Can you pack spices for me to carry abroad?", "Yes — we seal packs for suitcase packing. You must check airline, security and destination rules yourself. We do not ship the order as international cargo unless we agree that separately on WhatsApp."],
       ["What quantities can I order?", "Each product is offered in 100 g, 250 g, 500 g, 1 kg, 2 kg and 5 kg packs."],
       ["What is the maximum order quantity?", "5 kg per order. For more than 5 kg, please contact us for bulk enquiries."],
       ["Do you ship across India?", "We aim to ship across India. Availability and timing depend on courier service to your PIN code. We confirm this when we accept the order."],
@@ -549,10 +617,10 @@
     return `<section class="wrap page-head split">
       <div>
         <p class="kicker">About MAHFY</p>
-        <h1>From Kerala, with character.</h1>
-        <p>MAHFY is a Kerala-focused spice and coffee brand built around a simple idea: make good products easier to discover, understand and order.</p>
-        <p class="muted">We focus on carefully selected cardamom, black pepper and coffee, offering different grades and practical quantities for customers who want quality without having to buy in large wholesale quantities.</p>
-        <p class="muted">We do not claim certifications or processing methods we have not stated. What you see on each product page — grade, origin, pack size and price — is the information we stand behind.</p>
+        <h1>From Kerala, for two kitchens.</h1>
+        <p>MAHFY packs Kerala spices and coffee for the home cook, and for people going abroad for a job or studies who want that same cupboard after they land.</p>
+        <p class="muted">We are not a wholesale mandi and not a gift shop. We sell graded cardamom — including cardamom seed — pepper and coffee in 100 g to 5 kg packs, so a family can cook this month, or pack a tight bag to take abroad.</p>
+        <p class="muted">Tell us on WhatsApp if the order is for home use or for travel. We confirm grade, pack size and a seal that holds. We do not claim certifications we have not stated. What you see on each product page is what we stand behind.</p>
       </div>
       <img src="assets/kerala-plantation.jpg" alt="Kerala hills" style="border-radius:18px;width:100%;object-fit:cover;aspect-ratio:4/5" />
     </section>`;
@@ -567,6 +635,8 @@
       <p><a href="mailto:${CFG.email}">${CFG.email}</a> · <a href="${CFG.instagramUrl}" target="_blank" rel="noopener noreferrer">@mahfy_official</a></p>
       <p class="hero-cta">
         <a class="btn btn-wa" href="${waLink(CFG.waMessage)}" target="_blank" rel="noopener noreferrer">Enquiry on WhatsApp</a>
+        <a class="btn btn-line" href="${waLink("Hi MAHFY, this order is for home use. Please help me choose packs.")}" target="_blank" rel="noopener noreferrer">Home kitchen</a>
+        <a class="btn btn-line" href="${waLink("Hi MAHFY, I am going abroad for work / study and packing spices to take with me. Please suggest a pack.")}" target="_blank" rel="noopener noreferrer">Going abroad pack</a>
         ${telHref() ? `<a class="btn btn-line" href="${telHref()}">Call ${CFG.phone ? "+" + phoneNumber() : ""}</a>` : ""}
       </p>
       <p class="note">${CFG.shippingNote} Maximum 5 kg per standard order.</p>
@@ -657,9 +727,11 @@
     else html = notFound();
 
     app.innerHTML = html;
-    document.querySelectorAll(".nav a").forEach((a) => {
+    document.querySelectorAll(".nav a[data-link]").forEach((a) => {
       const href = a.getAttribute("href");
-      a.classList.toggle("active", href === "#/" + root || (href === "#/shop" && root === "shop"));
+      const home = !root;
+      const on = (href === "#/" && home) || (href === "#/" + root && !home) || (href === "#/shop" && root === "shop");
+      a.classList.toggle("active", on);
     });
     window.scrollTo(0, 0);
     if (after) after();

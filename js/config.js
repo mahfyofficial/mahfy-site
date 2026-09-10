@@ -4,7 +4,7 @@
    ============================================================ */
 window.MAHFY_CONFIG = {
   brand: "MAHFY",
-  tagline: "Kerala spices & coffee, thoughtfully selected.",
+  tagline: "Kerala spices for the home kitchen, and for people going abroad for work or study.",
   location: "Kerala, India",
   email: "mahfyofficial@gmail.com",
   whatsapp: "918304086127", // Enquiry on WhatsApp
@@ -26,5 +26,5 @@ window.MAHFY_CONFIG = {
   ],
   shippingNote: "Shipping charges extra — not included in the prices shown.",
   priceNote: "Prices shown are MAHFY retail rates, set above typical market/wholesale. Courier cost is billed separately.",
-  waMessage: "Hi MAHFY, I would like to enquire about your cardamom, pepper and coffee products."
+  waMessage: "Hi MAHFY, I would like to enquire about your spices. I am ordering for home use / I am going abroad for work or study (please advise packs)."
 };
