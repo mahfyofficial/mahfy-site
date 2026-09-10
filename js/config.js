@@ -4,7 +4,7 @@
    ============================================================ */
 window.MAHFY_CONFIG = {
   brand: "MAHFY",
-  tagline: "Kerala spices for the home kitchen, and for people going abroad for work or study.",
+  tagline: "Bring the taste of the hills home — Kerala cardamom, pepper and coffee.",
   location: "Kerala, India",
   email: "mahfyofficial@gmail.com",
   whatsapp: "918304086127", // Enquiry on WhatsApp

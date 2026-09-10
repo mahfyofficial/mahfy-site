@@ -3,6 +3,48 @@
    ============================================================ */
 window.MAHFY_ARTICLES = [
   {
+    slug: "how-to-choose-cardamom-grade",
+    title: "How to choose cardamom grade",
+    date: "2026-09-10",
+    minutes: 4,
+    image: "assets/spices/cardamom-8mm.jpg",
+    excerpt: "Start with how you cook, then pick a millimetre size — or seed if you want the kernel only.",
+    body: [
+      "MAHFY lists whole green cardamom by pod size in millimetres, plus cardamom seed (the inner kernel with the husk removed).",
+      "If you cook Kerala food most weeks and want a clear everyday size, 7 mm is a practical starting point. 7–8 mm looks larger in the pan and in a gift box. 8 mm is the extra-bold pod we list for people who care about appearance.",
+      "Smaller sizes (6 mm and under) are often chosen for grinding, blending or value cooking — they are still cardamom; the pods are simply smaller.",
+      "Choose seed when you want chai and masala without picking husk, or when pack weight matters (including packing to take abroad). Size is a sorting fact, not a promise that one grade is “the best spice in India.”"
+    ]
+  },
+  {
+    slug: "7mm-vs-8mm-cardamom",
+    title: "7 mm vs 8 mm cardamom",
+    date: "2026-09-10",
+    minutes: 3,
+    image: "assets/spices/cardamom-7-8mm.jpg",
+    excerpt: "The difference you can see is pod size. Aroma still depends on the lot and how you store it.",
+    body: [
+      "7 mm pods are a consistent everyday kitchen size. 8 mm pods are larger and look bolder on rice, in a jar, or as a gift.",
+      "We do not claim that 8 mm automatically smells stronger than 7 mm. Smell the pack you receive; keep it airtight.",
+      "If you are unsure, start with 100 g of the size that matches how you cook — tea and daily food, or presentation and gifting.",
+      "7–8 mm sits between the two if you want a larger pod without committing to extra-bold."
+    ]
+  },
+  {
+    slug: "how-much-spice-should-you-buy",
+    title: "How much spice should you buy?",
+    date: "2026-09-10",
+    minutes: 3,
+    image: "assets/packaging-care.jpg",
+    excerpt: "Match the pack to how fast you cook — not to a warehouse fantasy.",
+    body: [
+      "MAHFY packs start at 100 g (a fair trial) and go up to 5 kg per order. There is no 50 g pack on this catalogue.",
+      "100 g is for trying a grade. 250 g and 500 g suit a regular Indian kitchen. 1 kg and 2 kg are for stocking up. 5 kg is for a large household or a small business kitchen.",
+      "Coffee and ground pepper fade faster once opened. Buy what you will finish while it still smells alive.",
+      "If you are packing spices to take abroad for work or study, tell us on WhatsApp so we can seal the bag tightly. You still check airline and customs rules yourself."
+    ]
+  },
+  {
     slug: "spices-for-home-and-abroad",
     title: "Spices for home — and for packing abroad",
     date: "2026-09-10",
