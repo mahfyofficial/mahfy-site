@@ -1026,10 +1026,17 @@
       navScrim.hidden = false;
     }
   }
-  menuBtn.onclick = () => {
+  menuBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (nav.classList.contains("open")) closeMenu();
     else openMenu();
   };
+  if (nav) {
+    nav.addEventListener("click", (e) => {
+      if (e.target.closest("a[data-link]")) closeMenu();
+    });
+  }
   if (navScrim) navScrim.onclick = closeMenu;
 
   function bindSearch() {
