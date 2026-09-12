@@ -4,6 +4,13 @@
    ============================================================ */
 window.MAHFY_CONFIG = {
   brand: "MAHFY",
+  siteUrl: "https://mahfy.in",
+  /* Google Analytics 4: paste Measurement ID from analytics.google.com (G-XXXXXXXX). Leave blank until created. */
+  gaMeasurementId: "",
+  /* Google Search Console: paste the content= value from the HTML verification meta tag. */
+  gscVerification: "",
+  keywords:
+    "buy Kerala cardamom online, premium cardamom online India, green cardamom Kerala, buy black pepper from Kerala, Kerala coffee online, premium Kerala spices online, buy cardamom 100g online, Kerala spices online India",
   tagline: "Bring the taste of the hills home — Kerala cardamom, pepper and coffee.",
   location: "Kerala, India",
   email: "mahfyofficial@gmail.com",
@@ -11,6 +18,8 @@ window.MAHFY_CONFIG = {
   phone: "919207090583", // tap-to-call
   instagram: "mahfy_official",
   instagramUrl: "https://www.instagram.com/mahfy_official/",
+  youtube: "mahfyofficial",
+  youtubeUrl: "https://www.youtube.com/@mahfyofficial",
   hours: "Mon–Sat · 9:00–18:00 IST",
   currency: "₹",
   minGrams: 100,
@@ -24,7 +33,7 @@ window.MAHFY_CONFIG = {
     { label: "2 kg", grams: 2000 },
     { label: "5 kg", grams: 5000 }
   ],
-  shippingNote: "Shipping charges extra — not included in the prices shown.",
-  priceNote: "Prices shown are MAHFY retail rates, set above typical market/wholesale. Courier cost is billed separately.",
+  shippingNote: "Free delivery in India — no extra shipping charges.",
+  priceNote: "Prices shown are MAHFY retail rates, set above typical market/wholesale. Delivery in India is free.",
   waMessage: "Hi MAHFY, I would like to enquire about your spices. I am ordering for home use / I am going abroad for work or study (please advise packs)."
 };

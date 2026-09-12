@@ -1,0 +1,7 @@
+/robots.txt  /robots.txt  200
+/sitemap.xml /sitemap.xml 200
+/styles.css  /styles.css  200
+/prices.js   /prices.js   200
+/js/*        /js/:splat   200
+/assets/*    /assets/:splat  200
+/*           /index.html  200

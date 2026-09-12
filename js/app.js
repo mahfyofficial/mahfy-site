@@ -70,7 +70,7 @@
     const bits = products
       .filter((p) => p.pricePerKg != null)
       .map((p) => `<span class="tk">${p.name}${p.grade ? " (" + p.grade + ")" : ""} <b>${fmt(p.pricePerKg)}</b>/kg</span>`);
-    const extra = `<span class="tk tk-ship">Shipping charges extra</span><span class="tk">Home kitchen</span><span class="tk">Going abroad</span><span class="tk">Cardamom seed</span>`;
+    const extra = `<span class="tk tk-ship">Free delivery in India</span><span class="tk">Home kitchen</span><span class="tk">Going abroad</span><span class="tk">Cardamom seed</span>`;
     const html = bits.join("<span class='tk'>·</span>") + extra;
     $("#tickerTrack").innerHTML = html + html;
   }
@@ -93,6 +93,8 @@
         ? `WhatsApp: <a href="${href}" target="_blank" rel="noopener noreferrer">+${n}</a>`
         : `WhatsApp: <a href="${href}" target="_blank" rel="noopener noreferrer">Chat with MAHFY</a>`;
     }
+    const ytFoot = $("#ytLinkFoot");
+    if (ytFoot && CFG.youtubeUrl) ytFoot.href = CFG.youtubeUrl;
     const footPhone = $("#footerPhone");
     if (footPhone) {
       const n = phoneNumber();
@@ -105,19 +107,182 @@
   function setOrgJson() {
     const el = $("#jsonld-org");
     if (!el) return;
+    const tel = phoneNumber() ? "+" + phoneNumber() : undefined;
     el.textContent = JSON.stringify({
       "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "MAHFY",
-      email: CFG.email,
-      telephone: phoneNumber() ? "+" + phoneNumber() : undefined,
-      address: { "@type": "PostalAddress", addressRegion: "Kerala", addressCountry: "IN" },
-      sameAs: [CFG.instagramUrl]
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": SITE + "/#org",
+          name: "MAHFY",
+          url: SITE + "/",
+          email: CFG.email,
+          telephone: tel,
+          logo: absAsset("assets/logo.png"),
+          image: absAsset("assets/kerala-plantation.jpg"),
+          address: { "@type": "PostalAddress", addressRegion: "Kerala", addressCountry: "IN" },
+          sameAs: [CFG.instagramUrl, CFG.youtubeUrl].filter(Boolean)
+        },
+        {
+          "@type": ["LocalBusiness", "OnlineStore"],
+          "@id": SITE + "/#store",
+          name: "MAHFY",
+          url: SITE + "/",
+          image: absAsset("assets/kerala-plantation.jpg"),
+          telephone: tel,
+          email: CFG.email,
+          priceRange: "₹₹",
+          openingHours: "Mo-Sa 09:00-18:00",
+          address: { "@type": "PostalAddress", addressRegion: "Kerala", addressCountry: "IN" },
+          areaServed: { "@type": "Country", name: "India" },
+          currenciesAccepted: "INR",
+          paymentAccepted: "UPI, Bank transfer, confirmed on WhatsApp",
+          parentOrganization: { "@id": SITE + "/#org" }
+        }
+      ]
     });
   }
 
+  const SITE = String(CFG.siteUrl || "https://mahfy.in").replace(/\/$/, "");
+  const KEYWORDS = CFG.keywords || "";
+
+  function absAsset(src) {
+    if (!src) return SITE + "/assets/kerala-plantation.jpg";
+    if (/^https?:/i.test(src)) return src.split("?")[0];
+    return SITE + "/" + String(src).replace(/^\//, "").replace(/\?.*$/, "");
+  }
+
+  function pageUrl(path) {
+    let p = path;
+    if (!p) p = IS_FILE ? filePath : location.pathname || "/";
+    if (!p.startsWith("/")) p = "/" + p;
+    if (p !== "/" && p.endsWith("/")) p = p.slice(0, -1);
+    return SITE + p;
+  }
+
+  function setHeadMeta(attr, key, value) {
+    if (value == null || value === "") return;
+    let el = document.head.querySelector("meta[" + attr + '="' + key + '"]');
+    if (!el) {
+      el = document.createElement("meta");
+      el.setAttribute(attr, key);
+      document.head.appendChild(el);
+    }
+    el.setAttribute("content", value);
+  }
+
+  function setCanonical(href) {
+    let el = document.head.querySelector('link[rel="canonical"]');
+    if (!el) {
+      el = document.createElement("link");
+      el.rel = "canonical";
+      document.head.appendChild(el);
+    }
+    el.href = href;
+  }
+
+  function setPageJson(data) {
+    const el = $("#jsonld-page");
+    if (!el) return;
+    el.textContent = data ? JSON.stringify(data) : "";
+  }
+
+  function setSeo(opts) {
+    const t = opts.title || "MAHFY";
+    const full = /MAHFY/.test(t) ? t : t + " — MAHFY";
+    document.title = full;
+    const desc = opts.desc || "";
+    const url = pageUrl(opts.path);
+    const image = absAsset(opts.image || "assets/kerala-plantation.jpg");
+    setHeadMeta("name", "description", desc);
+    setHeadMeta("name", "keywords", opts.keywords || KEYWORDS);
+    setCanonical(url);
+    setHeadMeta("property", "og:title", full);
+    setHeadMeta("property", "og:description", desc);
+    setHeadMeta("property", "og:url", url);
+    setHeadMeta("property", "og:image", image);
+    setHeadMeta("property", "og:type", opts.type || "website");
+    setHeadMeta("property", "og:site_name", "MAHFY");
+    setHeadMeta("property", "og:locale", "en_IN");
+    setHeadMeta("name", "twitter:card", "summary_large_image");
+    setHeadMeta("name", "twitter:title", full);
+    setHeadMeta("name", "twitter:description", desc);
+    setHeadMeta("name", "twitter:image", image);
+    if (!opts.json) setPageJson(null);
+    else setPageJson(opts.json);
+  }
+
   function title(t) {
-    document.title = t + " — MAHFY";
+    document.title = /MAHFY/.test(t) ? t : t + " — MAHFY";
+  }
+
+  function trackPage() {
+    if (typeof window.gtag !== "function") return;
+    window.gtag("event", "page_view", {
+      page_title: document.title,
+      page_location: pageUrl(IS_FILE ? filePath : location.pathname),
+      page_path: IS_FILE ? filePath : location.pathname
+    });
+  }
+
+  const IS_FILE = location.protocol === "file:";
+  let filePath = "/";
+
+  function cleanPath(path) {
+    let url = path || "/";
+    if (url.charAt(0) === "#") url = url.slice(1);
+    if (!url.startsWith("/")) url = "/" + url;
+    if (url !== "/" && url.endsWith("/")) url = url.slice(0, -1);
+    return url;
+  }
+
+  function stripHash() {
+    if (!location.hash) return;
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch (e) {
+      location.hash = "";
+    }
+  }
+
+  function go(path, replace) {
+    const url = cleanPath(path);
+    if (IS_FILE) {
+      filePath = url;
+      stripHash();
+      render();
+      return;
+    }
+    if (replace) history.replaceState(null, "", url);
+    else if (url !== location.pathname) history.pushState(null, "", url);
+    render();
+  }
+
+  function migrateHash() {
+    const raw = location.hash || "";
+    if (IS_FILE) {
+      if (raw.indexOf("#/") === 0) {
+        filePath = cleanPath(raw.slice(1));
+      }
+      stripHash();
+      return;
+    }
+    if (!raw || raw === "#") return;
+    if (raw === "#/") {
+      history.replaceState(null, "", "/");
+      return;
+    }
+    if (raw.indexOf("#/") === 0) {
+      const next = "/" + raw.slice(2).replace(/^\/+/, "");
+      history.replaceState(null, "", next || "/");
+    }
+  }
+
+  function routeParts() {
+    if (IS_FILE) {
+      return filePath.replace(/^\/+/, "").split("/").filter(Boolean);
+    }
+    return location.pathname.replace(/\/+$/, "").split("/").filter(Boolean);
   }
 
   function productCard(p) {
@@ -125,14 +290,14 @@
     const cat = (CATS.find((c) => c.id === p.category) || {}).label || p.category;
     const seed = p.id === "card-seeds";
     return `<article class="card card-${p.category}${seed ? " card-featured" : ""}">
-      <a href="#/product/${p.id}" data-link>
+      <a href="/product/${p.id}" data-link>
         <div class="card-img"><img src="${p.images[0]}" alt="${p.name}" loading="lazy" />${seed ? `<span class="card-badge">Seed</span>` : ""}</div>
         <div class="card-body">
           <p class="kicker">${cat}</p>
           <h3>${p.name}</h3>
           <p class="meta">Grade: ${p.grade} · Origin: ${p.origin}</p>
           <p class="price">${start != null ? "From " + fmt(start) + " / 100 g" : "Price on enquiry"}</p>
-          <p class="ship-flag">Shipping extra</p>
+          <p class="ship-flag">Free delivery</p>
           <div class="weights">${WEIGHTS.map((w) => `<span>${w.label}</span>`).join("")}</div>
           <span class="btn btn-line">Experience the aroma</span>
           <span class="micro">One opening. One aroma. You'll understand.</span>
@@ -140,7 +305,7 @@
       </a>
       <p class="card-wa">
         <a class="btn btn-wa" href="${waLink(
-          "Hi MAHFY, I would like to order " + p.name + (p.grade ? " (" + p.grade + ")" : "") + ". Packs from 100 g to 5 kg. Shipping extra."
+          "Hi MAHFY, I would like to order " + p.name + (p.grade ? " (" + p.grade + ")" : "") + ". Packs from 100 g to 5 kg. Free delivery in India."
         )}" target="_blank" rel="noopener noreferrer">Order on WhatsApp</a>
       </p>
     </article>`;
@@ -187,7 +352,12 @@
   }
 
   function home() {
-    title("Bring the taste of the hills home");
+    setSeo({
+      title: "Buy Kerala cardamom online | Premium Kerala spices | MAHFY",
+      desc: "Buy Kerala cardamom online, including green cardamom from Kerala in 100 g packs. Premium Kerala spices online in India — buy black pepper from Kerala and Kerala coffee online. Order on WhatsApp.",
+      path: "/",
+      image: "assets/kerala-plantation.jpg"
+    });
     const featured = products.filter((p) =>
       ["card-seeds", "card-8mm", "pepper-malabar", "coffee-arabica"].includes(p.id)
     );
@@ -211,24 +381,24 @@
       .map((r) => {
         const p = byId[r[5]];
         const price = p && p.pricePerKg != null ? "From " + fmt(packPrice(p.pricePerKg, 100)) + " / 100 g" : "On enquiry";
-        return `<tr><td><strong>${r[0]}</strong></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${price}</td><td><a href="#/product/${r[5]}" data-link>View</a></td></tr>`;
+        return `<tr><td><strong>${r[0]}</strong></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${price}</td><td><a href="/product/${r[5]}" data-link>View</a></td></tr>`;
       })
       .join("");
     const comboMsg = waLink(
-      "Hi MAHFY, I would like the starter collection: Green Cardamom + Black Pepper + Coffee. Please suggest grades and pack sizes. Shipping extra."
+      "Hi MAHFY, I would like the starter collection: Green Cardamom + Black Pepper + Coffee. Please suggest grades and pack sizes. Free delivery in India."
     );
     return `<section class="hero-cine">
-      <img class="hero-bg" src="assets/kerala-plantation.jpg" alt="Misty Western Ghats plantation hills" />
+      <img class="hero-bg" src="assets/kerala-plantation.jpg" alt="Green cardamom Kerala hills and Western Ghats plantations" fetchpriority="high" decoding="async" />
       <div class="hero-steam" aria-hidden="true"></div>
-      <img class="hero-float a" src="assets/spices/cardamom-8mm.jpg" alt="Fresh green cardamom pods" />
-      <img class="hero-float b" src="assets/spices/pepper-malabar.jpg?v=2" alt="Black peppercorns" />
+      <img class="hero-float a" src="assets/spices/cardamom-8mm.jpg" alt="Buy Kerala cardamom online — green cardamom pods" />
+      <img class="hero-float b" src="assets/spices/pepper-malabar.jpg?v=2" alt="Buy black pepper from Kerala" />
       <div class="hero-inner">
-        <p class="kicker" style="color:#e6d4a8">Kerala origin · Packed to order</p>
+        <p class="kicker" style="color:#e6d4a8">Kerala spices online India · Packed to order</p>
         <h1>Bring the Taste of the Hills Home.</h1>
-        <p class="sub">Premium cardamom, bold pepper and carefully selected coffee — chosen for the aroma, freshness and character they bring to every cup and every meal.</p>
+        <p class="sub">Buy Kerala cardamom online, buy black pepper from Kerala, and order Kerala coffee online — premium Kerala spices packed from 100 g for kitchens across India.</p>
         <div class="hero-cta">
-          <a class="btn btn-gold" href="#/shop" data-link>Explore the Collection</a>
-          <a class="btn btn-line" href="#/finder" data-link style="border-color:#efe6d8;color:#f7f2ea">Find Your Perfect Spice</a>
+          <a class="btn btn-gold" href="/shop" data-link>Explore the Collection</a>
+          <a class="btn btn-line" href="/finder" data-link style="border-color:#efe6d8;color:#f7f2ea">Find Your Perfect Spice</a>
         </div>
         <div class="hero-pills">
           <span>Premium</span><span>Natural</span><span>Kerala origin</span><span>Order on WhatsApp</span>
@@ -277,8 +447,8 @@
           <div class="xbody">
             <p class="kicker">For aroma</p>
             <h3>Green Cardamom</h3>
-            <p class="muted">Bright, fragrant and naturally luxurious.</p>
-            <a class="btn btn-line" href="#/shop/cardamom" data-link>Explore Cardamom</a>
+            <p class="muted">Green cardamom from Kerala — bright, fragrant pods, and seed if you want the kernel only. Buy cardamom 100 g online to try a grade.</p>
+            <a class="btn btn-line" href="/shop/cardamom" data-link>Explore Cardamom</a>
           </div>
         </article>
         <article class="xcard">
@@ -286,8 +456,8 @@
           <div class="xbody">
             <p class="kicker">For boldness</p>
             <h3>Black Pepper</h3>
-            <p class="muted">Warm heat that belongs in everyday cooking.</p>
-            <a class="btn btn-line" href="#/shop/pepper" data-link>Explore Pepper</a>
+            <p class="muted">Buy black pepper from Kerala — whole Malabar, extra-bold, white or ground.</p>
+            <a class="btn btn-line" href="/shop/pepper" data-link>Explore Pepper</a>
           </div>
         </article>
         <article class="xcard">
@@ -295,8 +465,8 @@
           <div class="xbody">
             <p class="kicker">For your daily ritual</p>
             <h3>Premium Coffee</h3>
-            <p class="muted">A cup worth waiting for, from Kerala hills.</p>
-            <a class="btn btn-line" href="#/shop/coffee" data-link>Explore Coffee</a>
+            <p class="muted">Kerala coffee online — Arabica, Robusta and filter blend for the morning cup.</p>
+            <a class="btn btn-line" href="/shop/coffee" data-link>Explore Coffee</a>
           </div>
         </article>
         <article class="xcard">
@@ -305,7 +475,7 @@
             <p class="kicker">For gifting</p>
             <h3>Premium Spice Selection</h3>
             <p class="muted">A pack that says you chose with care.</p>
-            <a class="btn btn-line" href="#/shop" data-link>Explore Gifts</a>
+            <a class="btn btn-line" href="/shop" data-link>Explore Gifts</a>
           </div>
         </article>
       </div>
@@ -314,10 +484,10 @@
       <div class="center">
         <p class="kicker">Featured</p>
         <h2>Open the pack. Let the aroma speak.</h2>
-        <p class="lead">Live MAHFY retail prices · Shipping extra · 100 g to 5 kg</p>
+        <p class="lead">Live MAHFY retail prices · Free delivery in India · 100 g to 5 kg</p>
       </div>
       <div class="grid-4" style="margin-top:2rem">${featured.map(productCard).join("")}</div>
-      <p class="center" style="margin-top:1.6rem"><a class="btn btn-dark" href="#/shop" data-link>Shop the full collection</a></p>
+      <p class="center" style="margin-top:1.6rem"><a class="btn btn-dark" href="/shop" data-link>Shop the full collection</a></p>
     </section>
     <section class="pace">
       <div class="wrap center">
@@ -328,7 +498,7 @@
         A little more fragrance.
         A little more character.
         A little more pleasure in an ordinary moment.</p>
-        <p style="margin-top:1.6rem"><a class="btn btn-gold" href="#/shop/cardamom" data-link>Make It Part of Your Kitchen</a></p>
+        <p style="margin-top:1.6rem"><a class="btn btn-gold" href="/shop/cardamom" data-link>Make It Part of Your Kitchen</a></p>
       </div>
     </section>
     <section class="wrap section reveal">
@@ -342,7 +512,7 @@
         <span><strong>Select</strong><br /><small>Chosen for the current packing</small></span><em>↓</em>
         <span><strong>Grade</strong><br /><small>Pods by millimetre; seed husked</small></span><em>↓</em>
         <span><strong>Pack</strong><br /><small>Food-safe bags, packed to order</small></span><em>↓</em>
-        <span><strong>Deliver</strong><br /><small>Courier in India · shipping extra</small></span><em>↓</em>
+        <span><strong>Deliver</strong><br /><small>Free delivery in India</small></span><em>↓</em>
         <span><strong>Enjoy</strong><br /><small>Open, smell, cook</small></span>
       </div>
     </section>
@@ -400,9 +570,9 @@
         <p class="kicker">Start your Mahfy journey</p>
         <h2>Not sure where to start?</h2>
         <p class="muted">Start with the flavours that define the collection — cardamom, black pepper and coffee. Tell us on WhatsApp if the pack is for the kitchen at home, or for packing when you go abroad for work or study.</p>
-        <p class="ship-callout">Packed to order · Shipping extra</p>
+        <p class="ship-callout">Packed to order · Free delivery in India</p>
         <p class="hero-cta">
-          <a class="btn btn-dark" href="#/combos" data-link>Explore the Starter Collection</a>
+          <a class="btn btn-dark" href="/combos" data-link>Explore the Starter Collection</a>
           <a class="btn btn-wa" href="${comboMsg}" target="_blank" rel="noopener noreferrer">Ask for this trio</a>
         </p>
       </div>
@@ -414,7 +584,7 @@
         <h2>Authority without the lecture.</h2>
       </div>
       <div class="grid-3" style="margin-top:2rem">${ARTICLES.slice(0, 6).map(articleCard).join("")}</div>
-      <p class="center" style="margin-top:1.4rem"><a class="btn btn-line" href="#/kitchen" data-link>All kitchen notes</a></p>
+      <p class="center" style="margin-top:1.4rem"><a class="btn btn-line" href="/kitchen" data-link>All kitchen notes</a></p>
     </section>
     <section class="wrap section center reveal">
       <p class="kicker">Instagram</p>
@@ -423,11 +593,18 @@
       <div class="ig-grid" style="margin:1.6rem 0">${ig.map((src) => `<img src="${src}" alt="" loading="lazy" />`).join("")}</div>
       <a class="btn btn-dark" href="${CFG.instagramUrl}" target="_blank" rel="noopener noreferrer">Follow @mahfy_official</a>
     </section>
+    <section class="wrap section reveal">
+      <div class="center">
+        <p class="kicker">Kerala spices online India</p>
+        <h2>Premium Kerala spices, packed to order.</h2>
+        <p class="lead">MAHFY is a catalogue for people who want to buy Kerala cardamom online, choose green cardamom from Kerala by millimetre grade, buy black pepper from Kerala, and order Kerala coffee online. Start with 100 g if you are trying a lot; packs go up to 5 kg. Delivery in India is free — no extra shipping charges. There is no cart — confirm on WhatsApp.</p>
+      </div>
+    </section>
     <section class="final-cta wrap">
       <p class="kicker">MAHFY</p>
       <h2>Your kitchen deserves better ingredients.</h2>
       <p class="lead">Explore Mahfy's collection and find the flavour that belongs in your kitchen.</p>
-      <p style="margin-top:1.4rem"><a class="btn btn-dark" href="#/shop" data-link>Shop Mahfy</a></p>
+      <p style="margin-top:1.4rem"><a class="btn btn-dark" href="/shop" data-link>Shop Mahfy</a></p>
       <p class="note">Prices updated: ${dateLabel}. ${CFG.priceNote}</p>
     </section>`;
   }
@@ -472,7 +649,7 @@
 
   function articleCard(a) {
     return `<article class="card">
-      <a href="#/kitchen/${a.slug}" data-link>
+      <a href="/kitchen/${a.slug}" data-link>
         <div class="card-img"><img src="${a.image}" alt="" /></div>
         <div class="card-body">
           <p class="meta">${a.minutes} min · ${a.date}</p>
@@ -484,21 +661,56 @@
   }
 
   function shop(cat) {
-    title("Shop");
     const active = cat || "all";
     const list = products.filter((p) => active === "all" || p.category === active);
     const heads = {
-      all: ["The collection", "Cardamom, pepper, coffee and more — graded, priced, packed to order."],
-      cardamom: ["Green cardamom", "Bright, fragrant and naturally luxurious. Pods by millimetre, or seed without the husk."],
-      pepper: ["Black pepper", "Bold pepper. Real warmth. Whole, extra-bold, white and ground."],
-      coffee: ["Kerala coffee", "Coffee that makes the morning worth waiting for."],
-      other: ["Other spices", "Nutmeg and mace for the kitchen that already knows cardamom."]
+      all: {
+        t: "Premium Kerala spices online",
+        d: "Cardamom, pepper, coffee and more — graded, priced, packed to order.",
+        seoTitle: "Premium Kerala spices online India | Shop MAHFY",
+        seoDesc: "Shop premium Kerala spices online in India. Buy Kerala cardamom online, buy black pepper from Kerala, and order Kerala coffee online. Packs from 100 g to 5 kg.",
+        path: "/shop"
+      },
+      cardamom: {
+        t: "Buy Kerala cardamom online",
+        d: "Premium cardamom online India — green cardamom from Kerala, pods by millimetre, or seed without the husk. Buy cardamom 100 g online to try a grade.",
+        seoTitle: "Buy Kerala cardamom online | Green cardamom Kerala | MAHFY",
+        seoDesc: "Buy Kerala cardamom online. Green cardamom from Kerala in 100 g to 5 kg packs, graded by millimetre, plus cardamom seed. Premium cardamom online India. Order on WhatsApp.",
+        path: "/shop/cardamom"
+      },
+      pepper: {
+        t: "Buy black pepper from Kerala",
+        d: "Bold pepper from Kerala. Whole, extra-bold, white and ground.",
+        seoTitle: "Buy black pepper from Kerala | MAHFY",
+        seoDesc: "Buy black pepper from Kerala — Malabar, Tellicherry-style extra bold, white and ground. Premium Kerala spices online. Packs from 100 g.",
+        path: "/shop/pepper"
+      },
+      coffee: {
+        t: "Kerala coffee online",
+        d: "Kerala coffee online — Arabica, Robusta and filter blend.",
+        seoTitle: "Kerala coffee online | MAHFY",
+        seoDesc: "Order Kerala coffee online: Arabica, Robusta and filter blend. Premium Kerala spices and coffee, packed to order from 100 g.",
+        path: "/shop/coffee"
+      },
+      other: {
+        t: "Other spices",
+        d: "Nutmeg and mace for the kitchen that already knows cardamom.",
+        seoTitle: "Other Kerala spices | MAHFY",
+        seoDesc: "Nutmeg and mace from the MAHFY Kerala spices collection. Packed to order, 100 g to 5 kg.",
+        path: "/shop/other"
+      }
     };
     const h = heads[active] || heads.all;
+    setSeo({
+      title: h.seoTitle,
+      desc: h.seoDesc,
+      path: h.path,
+      image: active === "pepper" ? "assets/spices/pepper-malabar.jpg" : active === "coffee" ? "assets/spices/coffee-arabica.jpg" : "assets/spices/cardamom-8mm.jpg"
+    });
     return `<section class="wrap page-head">
       <p class="kicker">Shop</p>
-      <h1>${h[0]}</h1>
-      <p class="muted">${h[1]} Packs from 100 g to 5 kg. Shipping extra.</p>
+      <h1>${h.t}</h1>
+      <p class="muted">${h.d} Packs from 100 g to 5 kg. Free delivery in India. Kerala spices online India — order on WhatsApp.</p>
       <div class="filters">
         <button class="chip ${active === "all" ? "active" : ""}" data-cat="all">All</button>
         ${CATS.map((c) => `<button class="chip ${active === c.id ? "active" : ""}" data-cat="${c.id}">${c.label}</button>`).join("")}
@@ -508,11 +720,15 @@
   }
 
   function combos() {
-    title("Starter collection");
+    setSeo({
+      title: "Starter collection | Premium Kerala spices online | MAHFY",
+      desc: "Start with green cardamom Kerala, black pepper from Kerala and Kerala coffee online. Confirm grades and 100 g–5 kg packs on WhatsApp.",
+      path: "/combos"
+    });
     const ids = ["card-8mm", "pepper-malabar", "coffee-arabica"];
     const list = ids.map((id) => byId[id]).filter(Boolean);
     const msg = waLink(
-      "Hi MAHFY, I would like the starter collection: Cardamom + Black Pepper + Coffee. Please suggest grades and sizes. Shipping extra."
+      "Hi MAHFY, I would like the starter collection: Cardamom + Black Pepper + Coffee. Please suggest grades and sizes. Free delivery in India."
     );
     return `<section class="wrap page-head">
       <p class="kicker">Combos</p>
@@ -521,7 +737,7 @@
       <div class="grid-3" style="margin-top:1.6rem">${list.map(productCard).join("")}</div>
       <p class="hero-cta" style="margin-top:1.6rem">
         <a class="btn btn-wa" href="${msg}" target="_blank" rel="noopener noreferrer">Explore the Starter Collection</a>
-        <a class="btn btn-line" href="#/shop" data-link>Browse everything</a>
+        <a class="btn btn-line" href="/shop" data-link>Browse everything</a>
       </p>
     </section>`;
   }
@@ -529,26 +745,69 @@
   function productPage(id) {
     const p = byId[id];
     if (!p) return notFound();
-    title(p.name);
+    const path = "/product/" + p.id;
+    const img0 = p.images && p.images[0];
+    let seoTitle = p.name + " | MAHFY";
+    let seoDesc = p.description;
+    if (p.category === "cardamom") {
+      seoTitle = p.name + " | Buy Kerala cardamom online | MAHFY";
+      seoDesc = p.description + " Buy cardamom 100 g online, or larger packs to 5 kg. Green cardamom Kerala. Order on WhatsApp.";
+    } else if (p.category === "pepper") {
+      seoTitle = p.name + " | Buy black pepper from Kerala | MAHFY";
+      seoDesc = p.description + " Premium Kerala spices online. Packs from 100 g.";
+    } else if (p.category === "coffee") {
+      seoTitle = p.name + " | Kerala coffee online | MAHFY";
+      seoDesc = p.description + " Order Kerala coffee online in 100 g to 5 kg packs.";
+    }
+    const offer = p.pricePerKg
+      ? {
+          "@type": "Offer",
+          url: pageUrl(path),
+          priceCurrency: "INR",
+          price: packPrice(p.pricePerKg, 100),
+          priceValidUntil: "2026-12-31",
+          availability: p.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          itemCondition: "https://schema.org/NewCondition",
+          seller: { "@id": SITE + "/#store" }
+        }
+      : undefined;
     const json = {
       "@context": "https://schema.org",
-      "@type": "Product",
-      name: p.name,
-      description: p.description,
-      image: p.images,
-      brand: { "@type": "Brand", name: "MAHFY" },
-      offers: p.pricePerKg
-        ? {
-            "@type": "Offer",
-            priceCurrency: "INR",
-            price: packPrice(p.pricePerKg, 100),
-            availability: p.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
-          }
-        : undefined
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE + "/" },
+            { "@type": "ListItem", position: 2, name: "Shop", item: SITE + "/shop" },
+            { "@type": "ListItem", position: 3, name: p.name, item: pageUrl(path) }
+          ]
+        },
+        {
+          "@type": "Product",
+          name: p.name,
+          description: p.description,
+          sku: p.id,
+          image: (p.images || []).map(absAsset),
+          brand: { "@type": "Brand", name: "MAHFY" },
+          url: pageUrl(path),
+          category: p.category,
+          additionalProperty: p.grade
+            ? [{ "@type": "PropertyValue", name: "Grade", value: p.grade }]
+            : undefined,
+          offers: offer
+        }
+      ]
     };
+    setSeo({
+      title: seoTitle,
+      desc: seoDesc,
+      path: path,
+      image: img0,
+      type: "product",
+      json: json
+    });
     const catLabel = (CATS.find((c) => c.id === p.category) || {}).label || p.category;
     return `<section class="wrap section pdp" data-product="${p.id}">
-      <script type="application/ld+json">${JSON.stringify(json)}</script>
       <div class="gallery">
         <img id="mainPhoto" src="${p.images[0]}" alt="${p.name}" />
         <div class="thumbs">${p.images.map((src, i) => `<button type="button" data-src="${src}" class="${i === 0 ? "active" : ""}"><img src="${src}" alt="" loading="lazy" /></button>`).join("")}</div>
@@ -561,7 +820,7 @@
         <p>${p.description}</p>
         <p class="price" id="pdpPrice">${p.pricePerKg != null ? fmt(packPrice(p.pricePerKg, 100)) : "—"}</p>
         <p class="note" id="pdpUnit">${p.pricePerKg != null ? fmt(p.pricePerKg) + " / kg · MAHFY retail" : ""}</p>
-        <p class="ship-callout">Shipping charges extra — not included in this price.</p>
+        <p class="ship-callout">Free delivery in India — no extra shipping charges.</p>
         <h2 style="font-size:1.7rem;margin:1.4rem 0 .4rem">Why you'll love it</h2>
         ${loveList(p)}
         <div class="sell-path">
@@ -606,7 +865,7 @@
           <div><strong>1. Confirmed</strong><p class="muted">We reply on WhatsApp with grade, weight and product total.</p></div>
           <div><strong>2. Packed</strong><p class="muted">Your spices are packed to order in a food-safe bag.</p></div>
           <div><strong>3. Dispatched</strong><p class="muted">Handed to a courier covering your PIN code in India.</p></div>
-          <div><strong>4. Delivered</strong><p class="muted">To your door. Shipping is billed separately.</p></div>
+          <div><strong>4. Delivered</strong><p class="muted">To your door in India. Delivery is free — no extra shipping charge.</p></div>
         </div>
         <dl class="facts">
           <div><dt>Grade</dt><dd>${p.grade}</dd></div>
@@ -659,9 +918,9 @@
         "Quantity: " + qty
       ];
       if (p.pricePerKg != null) {
-        bits.push("Approx. product total: " + fmt(packPrice(p.pricePerKg, grams) * qty) + " (shipping extra)");
+        bits.push("Approx. product total: " + fmt(packPrice(p.pricePerKg, grams) * qty) + " (free delivery in India)");
       }
-      bits.push("", "Purpose: home use / going abroad for work or study (please confirm).", "Shipping charges extra. Please confirm availability and shipping.");
+      bits.push("", "Purpose: home use / going abroad for work or study (please confirm).", "Free delivery in India. Please confirm availability.");
       return bits.filter(Boolean).join("\n");
     }
     function refresh() {
@@ -717,7 +976,11 @@
   }
 
   function pricesPage() {
-    title("Prices");
+    setSeo({
+      title: "Prices | Premium Kerala spices online | MAHFY",
+      desc: "MAHFY retail prices for Kerala cardamom, black pepper and coffee. Buy cardamom 100 g online or larger packs. Free delivery in India.",
+      path: "/prices"
+    });
     const rows = products
       .map((p) => {
         const cells = WEIGHTS.map((w) =>
@@ -729,7 +992,7 @@
     return `<section class="wrap page-head">
       <p class="kicker">Prices</p>
       <h1>Simple, transparent pricing.</h1>
-      <p class="muted">Our prices vary by product, grade and quantity. These are MAHFY retail rates — set above typical market/wholesale. Shipping is never included in the table.</p>
+      <p class="muted">Our prices vary by product, grade and quantity. These are MAHFY retail rates — set above typical market/wholesale. Delivery in India is free; there is no extra shipping charge.</p>
       <p class="ship-callout">${CFG.shippingNote}</p>
       <p class="note">Prices updated on ${dateLabel}. ${CFG.priceNote}</p>
       <div class="table-wrap" style="margin-top:1.2rem">
@@ -742,7 +1005,11 @@
   }
 
   function how() {
-    title("How to order");
+    setSeo({
+      title: "How to order | MAHFY",
+      desc: "How to buy Kerala cardamom online and other premium Kerala spices: browse the catalogue, then confirm the pack on WhatsApp. Free delivery in India.",
+      path: "/how-to-order"
+    });
     return `<section class="wrap page-head">
       <p class="kicker">How to order</p>
       <h1>Order only on WhatsApp.</h1>
@@ -751,7 +1018,7 @@
         <article class="step"><span class="step-n">01</span><h3>Say home or going abroad</h3><p class="muted">Home kitchen in India, or packing spices to take with you for a job or studies. That decides pods vs seed, and how tightly we pack.</p></article>
         <article class="step"><span class="step-n">02</span><h3>Choose product and weight</h3><p class="muted">Cardamom pods, cardamom seed, pepper, coffee. 100 g to 5 kg.</p></article>
         <article class="step"><span class="step-n">03</span><h3>Message MAHFY on WhatsApp</h3><p class="muted">Share product, grade, quantity, PIN code, and whether you are flying.</p></article>
-        <article class="step"><span class="step-n">04</span><h3>We confirm, pack and ship</h3><p class="muted">We pack in India. Shipping extra. If you carry the pack abroad, airline and customs rules are yours to check.</p></article>
+        <article class="step"><span class="step-n">04</span><h3>We confirm, pack and ship</h3><p class="muted">We pack in India. Delivery in India is free. If you carry the pack abroad, airline and customs rules are yours to check.</p></article>
       </div>
       <div class="audience" style="margin-top:2.5rem">
         <article>
@@ -779,7 +1046,11 @@
   }
 
   function kitchenList() {
-    title("Know your spice");
+    setSeo({
+      title: "Know your spice | Green cardamom Kerala & pepper notes | MAHFY",
+      desc: "Short notes on how to choose green cardamom from Kerala, store spices, and how much to buy — including 100 g starter packs.",
+      path: "/kitchen"
+    });
     return `<section class="wrap page-head">
       <p class="kicker">Know your spice</p>
       <h1>Choose with a clear head.</h1>
@@ -790,24 +1061,34 @@
 
   function kitchenArticle(slug) {
     if (slug === "spices-for-home-and-pravasi") {
-      location.hash = "#/kitchen/spices-for-home-and-abroad";
+      go("/kitchen/spices-for-home-and-abroad", true);
       return "";
     }
     const a = ARTICLES.find((x) => x.slug === slug);
     if (!a) return notFound();
-    title(a.title);
+    setSeo({
+      title: a.title + " | MAHFY",
+      desc: a.excerpt || a.title,
+      path: "/kitchen/" + a.slug,
+      image: a.image,
+      type: "article"
+    });
     return `<article class="wrap section article">
       <p class="kicker">Know your spice</p>
       <h1>${a.title}</h1>
       <p class="meta">${a.date} · ${a.minutes} min read</p>
       <img class="cover" src="${a.image}" alt="" />
       <div class="body">${a.body.map((p) => `<p>${p}</p>`).join("")}</div>
-      <p style="margin-top:1.5rem"><a class="btn btn-line" href="#/kitchen" data-link>All articles</a></p>
+      <p style="margin-top:1.5rem"><a class="btn btn-line" href="/kitchen" data-link>All articles</a></p>
     </article>`;
   }
 
   function faqPage() {
-    title("FAQ");
+    setSeo({
+      title: "FAQ | Buy Kerala spices online India | MAHFY",
+      desc: "Questions about buying Kerala cardamom online, pack sizes from 100 g, black pepper from Kerala, coffee, shipping and WhatsApp orders.",
+      path: "/faq"
+    });
     const items = [
       ["What products does MAHFY sell?", "Kerala-origin cardamom (whole pods by millimetre grade, plus cardamom seed), black pepper, coffee and selected spices, in listed pack sizes."],
       ["What cardamom grades are available?", "Whole pods by size: 8 mm, 7–8 mm, 7 mm, 6–7 mm, 6 mm, 5 mm, 4 mm and 3 mm. We also sell cardamom seed (the inner kernel, husked). Check the shop for live availability and prices."],
@@ -816,11 +1097,11 @@
       ["What quantities can I order?", "Each product is offered in 100 g, 250 g, 500 g, 1 kg, 2 kg and 5 kg packs."],
       ["What is the maximum order quantity?", "5 kg per order. For more than 5 kg, please contact us for bulk enquiries."],
       ["Do you ship across India?", "We aim to ship across India. Availability and timing depend on courier service to your PIN code. We confirm this when we accept the order."],
-      ["How are shipping charges calculated?", "Shipping charges are extra unless a specific offer says otherwise. We calculate them from weight and destination after you share your PIN code."],
+      ["Is delivery free?", "Yes. Delivery in India is free — there are no extra shipping charges on the listed prices. Timing still depends on courier service to your PIN code."],
       ["How should I store cardamom?", "Whole pods, airtight, away from heat, steam and sunlight. Crush just before use."],
       ["How should I store pepper?", "Keep whole pepper airtight. Crack or grind when you cook. Ground pepper should stay tightly closed."],
       ["How should I store coffee?", "Airtight, away from heat and moisture. Whole beans keep longer than ground coffee. Avoid the fridge if you can."],
-      ["How can I contact MAHFY?", "Orders and enquiries go through WhatsApp. You can also email mahfyofficial@gmail.com or write to Instagram @mahfy_official."],
+      ["How can I contact MAHFY?", "Orders go through WhatsApp. You can also email mahfyofficial@gmail.com, follow Instagram @mahfy_official, or watch YouTube @mahfyofficial."],
       ["Can I order on this website?", "No. There is no cart or checkout. Browse products, then tap Enquiry on WhatsApp or Order on WhatsApp."],
       ["Can I request a specific grade?", "Yes. Tell us the grade on WhatsApp. We confirm what is currently packed."],
       ["Can I order more than 5 kg?", "Not as a standard order. Send a bulk enquiry on WhatsApp."]
@@ -849,7 +1130,11 @@
   }
 
   function about() {
-    title("Our story");
+    setSeo({
+      title: "Our story | Premium Kerala spices | MAHFY",
+      desc: "MAHFY packs premium Kerala spices online — green cardamom from Kerala, black pepper and coffee — for home kitchens in India.",
+      path: "/about"
+    });
     return `<section class="wrap page-head">
       <p class="kicker">Our story</p>
       <h1>Mahfy is more than a spice store.</h1>
@@ -865,8 +1150,8 @@
         <p class="muted">The work is practical: choose a grade, pack it cleanly, send it so someone can cook. Home kitchens in India, and people going abroad for work or study, order the same catalogue.</p>
         <p class="muted" style="margin-top:1rem"><em>[Place for a short, true founder or family note — insert only when ready. Do not invent a plantation partnership.]</em></p>
         <p class="hero-cta">
-          <a class="btn btn-dark" href="#/shop" data-link>Shop the collection</a>
-          <a class="btn btn-line" href="#/contact" data-link>Contact</a>
+          <a class="btn btn-dark" href="/shop" data-link>Shop the collection</a>
+          <a class="btn btn-line" href="/contact" data-link>Contact</a>
         </p>
       </div>
       <img src="assets/kerala-plantation.jpg" alt="Kerala hills" style="border-radius:18px;width:100%;object-fit:cover;aspect-ratio:4/5" />
@@ -874,12 +1159,20 @@
   }
 
   function contact() {
-    title("Contact");
+    setSeo({
+      title: "Contact | MAHFY Kerala spices",
+      desc: "Contact MAHFY to buy Kerala cardamom online, black pepper from Kerala and Kerala coffee. WhatsApp, call or email.",
+      path: "/contact"
+    });
     return `<section class="wrap page-head">
       <p class="kicker">Contact</p>
       <h1>Write to MAHFY</h1>
       <p class="muted">${CFG.location} · ${CFG.hours}</p>
-      <p><a href="mailto:${CFG.email}">${CFG.email}</a> · <a href="${CFG.instagramUrl}" target="_blank" rel="noopener noreferrer">@mahfy_official</a></p>
+      <p><a href="mailto:${CFG.email}">${CFG.email}</a></p>
+      <p class="hero-cta">
+        ${CFG.instagramUrl ? `<a class="btn btn-line" href="${CFG.instagramUrl}" target="_blank" rel="noopener noreferrer">Instagram @${CFG.instagram || "mahfy_official"}</a>` : ""}
+        ${CFG.youtubeUrl ? `<a class="btn btn-line" href="${CFG.youtubeUrl}" target="_blank" rel="noopener noreferrer">YouTube @${CFG.youtube || "mahfy_official"}</a>` : ""}
+      </p>
       <p class="hero-cta">
         <a class="btn btn-wa" href="${waLink(CFG.waMessage)}" target="_blank" rel="noopener noreferrer">Enquiry on WhatsApp</a>
         <a class="btn btn-line" href="${waLink("Hi MAHFY, this order is for home use. Please help me choose packs.")}" target="_blank" rel="noopener noreferrer">Home kitchen</a>
@@ -896,6 +1189,7 @@
         t: "Privacy Policy",
         b: [
           "When you message MAHFY on WhatsApp or email, we use the details you share so we can reply and fulfil your order.",
+          "If Google Analytics is enabled on this site, it collects anonymised usage data (pages viewed, device type). You can block it with browser settings or extensions.",
           "We do not sell your contact details. Instagram and WhatsApp are third-party services with their own policies.",
           "Contact mahfyofficial@gmail.com for privacy questions."
         ]
@@ -904,7 +1198,7 @@
         t: "Terms & Conditions",
         b: [
           "This website is a catalogue. Orders are placed on WhatsApp, not through a cart or checkout on the site.",
-          "Listed prices are for the product only. Shipping is extra unless stated. A standard order may not exceed 5 kg.",
+          "Listed prices include free delivery in India. A standard order may not exceed 5 kg.",
           "Grades and availability can change with supply. We confirm the current lot when we accept the order on WhatsApp.",
           "Kerala, India."
         ]
@@ -912,7 +1206,7 @@
       shipping: {
         t: "Shipping Policy",
         b: [
-          "Shipping charges are extra unless a specific offer says otherwise.",
+          "Delivery in India is free. There are no extra shipping charges on listed prices.",
           "We pack after the order is accepted on WhatsApp. Processing time depends on the day’s packing load; we will share an estimate when we confirm.",
           "Delivery across India depends on courier coverage for your PIN code. We do not promise a fixed number of days until the courier booking is made.",
           "Tracking, when the courier provides it, will be shared on WhatsApp or email."
@@ -929,19 +1223,28 @@
       }
     };
     const p = pages[kind];
-    title(p.t);
+    setSeo({
+      title: p.t + " | MAHFY",
+      desc: p.b[0] || p.t,
+      path: "/" + kind
+    });
     return `<section class="wrap page-head article"><h1>${p.t}</h1>${p.b.map((x) => `<p class="muted">${x}</p>`).join("")}</section>`;
   }
 
   function notFound() {
-    return `<section class="wrap page-head"><h1>Page not found</h1><p><a href="#/shop" data-link>Back to shop</a></p></section>`;
+    setSeo({
+      title: "Page not found | MAHFY",
+      desc: "This page is not in the MAHFY catalogue. Shop Kerala spices online India from the collection.",
+      path: IS_FILE ? filePath : location.pathname
+    });
+    return `<section class="wrap page-head"><h1>Page not found</h1><p><a href="/shop" data-link>Back to shop</a></p></section>`;
   }
 
   function render() {
-    const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+    const parts = routeParts();
     const root = parts[0] || "";
     if (root === "cart" || root === "checkout" || root === "order-confirmation") {
-      location.hash = "#/how-to-order";
+      go("/how-to-order", true);
       return;
     }
     let html = "";
@@ -961,7 +1264,7 @@
         document.querySelectorAll(".chip").forEach((c) => {
           c.onclick = () => {
             const cat = c.dataset.cat;
-            location.hash = cat === "all" ? "#/shop" : "#/shop/" + cat;
+            go(cat === "all" ? "/shop" : "/shop/" + cat);
           };
         });
       };
@@ -990,17 +1293,18 @@
     const searchResults = $("#searchResults");
     if (searchResults) searchResults.innerHTML = "";
     document.querySelectorAll(".nav a[data-link]").forEach((a) => {
-      const href = a.getAttribute("href");
+      const href = (a.getAttribute("href") || "").replace(/^#/, "") || "/";
       const sub = parts[1] || "";
-      const homeOn = (!root || root === "finder") && href === "#/";
-      const shopAll = href === "#/shop" && root === "shop" && !sub;
-      const shopCat = href === "#/shop/" + sub && root === "shop" && !!sub;
-      const other = href === "#/" + root && root && root !== "shop" && root !== "finder";
+      const homeOn = (!root || root === "finder") && (href === "/" || href === "");
+      const shopAll = href === "/shop" && root === "shop" && !sub;
+      const shopCat = href === "/shop/" + sub && root === "shop" && !!sub;
+      const other = href === "/" + root && root && root !== "shop" && root !== "finder";
       a.classList.toggle("active", homeOn || shopAll || shopCat || other);
     });
     if (root !== "finder") window.scrollTo(0, 0);
     if (after) after();
     closeMenu();
+    trackPage();
   }
 
   const menuBtn = $("#menuBtn");
@@ -1075,7 +1379,7 @@
             .slice(0, 8)
             .map(
               (p) =>
-                `<a href="#/product/${p.id}" data-link>${p.name} <span class="muted">· ${p.grade}</span></a>`
+                `<a href="/product/${p.id}" data-link>${p.name} <span class="muted">· ${p.grade}</span></a>`
             )
             .join("")
         : `<p class="muted">No matches. Try cardamom, pepper or coffee.</p>`;
@@ -1090,11 +1394,20 @@
     });
   }
 
-  addEventListener("hashchange", render);
+  addEventListener("popstate", render);
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-link]");
+    if (!a) return;
+    const href = a.getAttribute("href");
+    if (!href || /^(https?:|mailto:|tel:)/i.test(href)) return;
+    if (href === "#app" || href === "#") return;
+    e.preventDefault();
+    go(href);
+  });
   ticker();
   setWa();
   setOrgJson();
   bindSearch();
-  if (!location.hash) location.hash = "#/";
-  else render();
+  migrateHash();
+  render();
 })();
